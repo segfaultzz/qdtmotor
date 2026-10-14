@@ -1,0 +1,238 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type Img = { url: string; name: string; uploadedAt: string };
+
+// Shrink big phone photos so they stay under Vercel's request size limit.
+async function shrink(file: File, max = 2200): Promise<File> {
+  if (file.type === "image/gif") return file;
+  const bmp = await createImageBitmap(file);
+  const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  if (scale === 1 && file.size < 3.5 * 1024 * 1024) return file;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bmp.width * scale);
+  canvas.height = Math.round(bmp.height * scale);
+  canvas.getContext("2d")!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  const blob: Blob = await new Promise((r) => canvas.toBlob((b) => r(b!), "image/jpeg", 0.85));
+  return new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" });
+}
+
+export default function Gallery({ admin = false }: { admin?: boolean }) {
+  const [images, setImages] = useState<Img[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [drag, setDrag] = useState(false);
+  const [open, setOpen] = useState<number | null>(null);
+  const input = useRef<HTMLInputElement>(null);
+
+  const load = useCallback(async () => {
+    const r = await fetch("/api/images", { cache: "no-store" });
+    setImages((await r.json()).images ?? []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/images", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => setImages(d.images ?? []))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Sends a request; if the server wants a password, ask once and retry.
+  async function authed(send: (h: Record<string, string>) => Promise<Response>) {
+    const saved = sessionStorage.getItem("qdt-pw");
+    let r = await send(saved ? { "x-admin-password": saved } : {});
+    if (r.status === 401) {
+      const p = prompt("Enter the admin password");
+      if (!p) return r;
+      sessionStorage.setItem("qdt-pw", p);
+      r = await send({ "x-admin-password": p });
+      if (r.status === 401) sessionStorage.removeItem("qdt-pw");
+    }
+    return r;
+  }
+
+  async function upload(list: FileList | File[]) {
+    const files = Array.from(list).filter((f) => f.type.startsWith("image/"));
+    if (!files.length) return setMsg("Please choose image files.");
+    setBusy(true);
+    setMsg("");
+    try {
+      const form = new FormData();
+      for (const f of files) form.append("files", await shrink(f));
+      const r = await authed((headers) => fetch("/api/images", { method: "POST", body: form, headers }));
+      const data = await r.json();
+      if (!r.ok) setMsg(data.error ?? "Upload failed");
+      else {
+        setMsg(`Uploaded ${data.images.length} image(s)`);
+        await load();
+      }
+    } catch {
+      setMsg("Upload failed. Try again.");
+    } finally {
+      setBusy(false);
+      if (input.current) input.current.value = "";
+    }
+  }
+
+  async function remove(url: string) {
+    if (!confirm("Delete this image?")) return;
+    const r = await authed((headers) =>
+      fetch("/api/images", {
+        method: "DELETE",
+        headers: { "content-type": "application/json", ...headers },
+        body: JSON.stringify({ url }),
+      }),
+    );
+    if (!r.ok) return setMsg("Delete failed (wrong password?)");
+    setOpen(null);
+    load();
+  }
+
+  useEffect(() => {
+    if (open === null) return;
+    const k = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(null);
+      if (e.key === "ArrowRight") setOpen((i) => (i === null ? i : (i + 1) % images.length));
+      if (e.key === "ArrowLeft") setOpen((i) => (i === null ? i : (i - 1 + images.length) % images.length));
+    };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, [open, images.length]);
+
+  return (
+    <div>
+      {admin && (
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDrag(true);
+        }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDrag(false);
+          upload(e.dataTransfer.files);
+        }}
+        onClick={() => input.current?.click()}
+        className={`cursor-pointer rounded-3xl border-2 border-dashed p-10 text-center transition ${
+          drag ? "border-red-500 bg-red-500/10" : "border-white/20 bg-white/5 hover:border-red-500/60"
+        }`}
+      >
+        <input ref={input} type="file" accept="image/*" multiple hidden onChange={(e) => e.target.files && upload(e.target.files)} />
+        <p className="text-lg font-semibold text-white">{busy ? "Uploading…" : "Drop vehicle photos here or click to upload"}</p>
+        <p className="mt-1 text-sm text-white/50">JPG, PNG, WebP — large photos are resized automatically</p>
+        {msg && <p className="mt-3 text-sm text-red-400">{msg}</p>}
+      </div>
+      )}
+
+      {loading ? (
+        <div className="mt-10 grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[240px] md:grid-cols-4 md:gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className={`animate-pulse rounded-2xl bg-white/5 ${i % 7 === 0 ? "col-span-2 row-span-2" : ""}`} />
+          ))}
+        </div>
+      ) : images.length === 0 ? (
+        <p className="mt-10 text-center text-white/50">{admin ? "No photos yet — upload your first one above." : "Photos coming soon."}</p>
+      ) : (
+        <>
+          <p className="mt-8 text-sm text-white/40">{images.length} photo{images.length === 1 ? "" : "s"}</p>
+          <div className="mt-4 grid auto-rows-[180px] grid-flow-dense grid-cols-2 gap-3 md:auto-rows-[240px] md:grid-cols-4 md:gap-4">
+            {images.map((img, i) => {
+              const size = i % 7 === 0 ? "col-span-2 row-span-2" : i % 7 === 3 ? "md:col-span-2" : "";
+              return (
+                <button
+                  key={img.url}
+                  onClick={() => setOpen(i)}
+                  className={`group relative overflow-hidden rounded-2xl bg-neutral-900 ring-1 ring-white/10 ${size}`}
+                  aria-label={`Open photo ${i + 1}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img.url}
+                    alt={img.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-black/70 via-transparent to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100">
+                    <span className="text-sm font-semibold text-white">View</span>
+                    <span className="rounded-full bg-red-600 px-2.5 py-1 text-xs text-white">⤢</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {open !== null && images[open] && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/95 backdrop-blur" onClick={() => setOpen(null)}>
+          <div className="flex items-center justify-between px-5 py-4 text-white" onClick={(e) => e.stopPropagation()}>
+            <span className="text-sm text-white/60">
+              {open + 1} / {images.length}
+            </span>
+            <div className="flex items-center gap-3">
+              {admin && (
+                <button className="rounded-full bg-red-600 px-4 py-1.5 text-sm" onClick={() => remove(images[open].url)}>
+                  Delete
+                </button>
+              )}
+              <button className="text-3xl leading-none" onClick={() => setOpen(null)} aria-label="Close">
+                ×
+              </button>
+            </div>
+          </div>
+          <div className="relative flex min-h-0 flex-1 items-center justify-center px-4">
+            {images.length > 1 && (
+              <button
+                className="absolute left-3 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-red-600 md:left-6"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen((open - 1 + images.length) % images.length);
+                }}
+                aria-label="Previous"
+              >
+                ‹
+              </button>
+            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={images[open].url}
+              alt={images[open].name}
+              className="max-h-full max-w-full rounded-xl object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+            {images.length > 1 && (
+              <button
+                className="absolute right-3 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-red-600 md:right-6"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen((open + 1) % images.length);
+                }}
+                aria-label="Next"
+              >
+                ›
+              </button>
+            )}
+          </div>
+          <div className="flex gap-2 overflow-x-auto px-5 py-4" onClick={(e) => e.stopPropagation()}>
+            {images.map((img, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={img.url}
+                src={img.url}
+                alt=""
+                onClick={() => setOpen(i)}
+                className={`h-16 w-24 shrink-0 cursor-pointer rounded-lg object-cover transition ${
+                  i === open ? "opacity-100 ring-2 ring-red-500" : "opacity-50 hover:opacity-100"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
