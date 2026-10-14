@@ -16,10 +16,6 @@ const mapLink = (address: string) => `https://www.google.com/maps/search/?api=1&
 // Addresses are kept in English so couriers, maps and customers worldwide can all use them.
 const locations = [
   {
-    name: "Qin Datou (Wuxi) Vehicle Industry Co., Ltd",
-    address: "No. 88-8 East Xihu Road, Houqiao Subdistrict, Xishan District, Wuxi City, Jiangsu Province, China",
-  },
-  {
     name: "Qin Datou Vehicle Industry",
     address: "No. 105 Qinghong Road, Ehu Town, Xishan District, Wuxi City, Jiangsu Province, China",
   },

@@ -23,16 +23,8 @@ export default function About() {
 
   return (
     <section id="about" className="relative w-full overflow-hidden border-t border-white/10 bg-neutral-950 px-6 py-24 md:px-12 md:py-36">
-      {/* atmosphere: red glow + faint engineering grid */}
+      {/* atmosphere: soft red glow */}
       <div className="pointer-events-none absolute -right-40 -top-40 h-[600px] w-[600px] rounded-full bg-red-600/15 blur-[140px]" />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.07] [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-        }}
-      />
 
       <div className="relative">
         <Reveal>
