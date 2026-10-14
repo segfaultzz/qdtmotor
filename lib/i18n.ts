@@ -626,10 +626,15 @@ const bn: Dict = {
 export const dictionaries: Record<Locale, Dict> = { en, zh, ar, es, fr, ru, bn };
 
 export function detectLocale(): Locale {
+  // 1. A language the visitor chose themselves always wins.
   try {
     const saved = localStorage.getItem("qdt-lang");
     if (saved && saved in dictionaries) return saved as Locale;
   } catch {}
+  // 2. The visitor's country (set by proxy.ts from their IP on Vercel).
+  const geo = document.cookie.match(/(?:^|; )qdt-geo=([^;]+)/)?.[1];
+  if (geo && geo in dictionaries) return geo as Locale;
+  // 3. The browser language.
   for (const l of navigator.languages ?? [navigator.language]) {
     const code = l.toLowerCase().split("-")[0];
     if (code in dictionaries) return code as Locale;
