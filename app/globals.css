@@ -152,3 +152,10 @@ html[lang="ar"] * {
   letter-spacing: normal !important;
   text-transform: none !important;
 }
+
+/* Gallery slideshow progress bar */
+@keyframes gallery-progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+.gallery-progress { animation: gallery-progress 5s linear forwards; }

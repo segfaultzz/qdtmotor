@@ -27,6 +27,8 @@ const en = {
   "gallery.close": "Close",
   "gallery.prev": "Previous",
   "gallery.next": "Next",
+  "gallery.all": "All photos",
+  "gallery.showMore": "Show more",
 
   "about.eyebrow": "About us",
   "about.t1": "Built on",
@@ -99,6 +101,8 @@ const zh: Dict = {
   "gallery.close": "关闭",
   "gallery.prev": "上一张",
   "gallery.next": "下一张",
+  "gallery.all": "全部图片",
+  "gallery.showMore": "查看更多",
 
   "about.eyebrow": "关于我们",
   "about.t1": "立足于",
@@ -168,6 +172,8 @@ const ar: Dict = {
   "gallery.close": "إغلاق",
   "gallery.prev": "السابق",
   "gallery.next": "التالي",
+  "gallery.all": "جميع الصور",
+  "gallery.showMore": "عرض المزيد",
 
   "about.eyebrow": "من نحن",
   "about.t1": "نبني على",
@@ -237,6 +243,8 @@ const es: Dict = {
   "gallery.close": "Cerrar",
   "gallery.prev": "Anterior",
   "gallery.next": "Siguiente",
+  "gallery.all": "Todas las fotos",
+  "gallery.showMore": "Ver más",
 
   "about.eyebrow": "Sobre nosotros",
   "about.t1": "Construidos sobre la",
@@ -306,6 +314,8 @@ const fr: Dict = {
   "gallery.close": "Fermer",
   "gallery.prev": "Précédent",
   "gallery.next": "Suivant",
+  "gallery.all": "Toutes les photos",
+  "gallery.showMore": "Voir plus",
 
   "about.eyebrow": "À propos de nous",
   "about.t1": "Bâtis sur la",
@@ -375,6 +385,8 @@ const ru: Dict = {
   "gallery.close": "Закрыть",
   "gallery.prev": "Назад",
   "gallery.next": "Далее",
+  "gallery.all": "Все фото",
+  "gallery.showMore": "Показать ещё",
 
   "about.eyebrow": "О нас",
   "about.t1": "Основаны на",
@@ -444,6 +456,8 @@ const bn: Dict = {
   "gallery.close": "বন্ধ করুন",
   "gallery.prev": "আগের",
   "gallery.next": "পরের",
+  "gallery.all": "সব ছবি",
+  "gallery.showMore": "আরও দেখুন",
 
   "about.eyebrow": "আমাদের সম্পর্কে",
   "about.t1": "ভিত্তি",
