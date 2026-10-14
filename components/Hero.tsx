@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { T } from "./LanguageProvider";
 
 export default function Hero() {
   const [src, setSrc] = useState<string | null>(null);
@@ -36,13 +38,16 @@ export default function Hero() {
         <a href="#" aria-label="QDT Motor home">
           <Image src="/logo-white.png" alt="QDT Motor" width={954} height={834} priority className="h-9 w-auto sm:h-16 md:h-20" />
         </a>
-        <div className="flex gap-4 text-xs font-medium text-white/80 sm:gap-8 sm:text-sm">
-          <a href="#gallery" className="hover:text-white">Gallery</a>
-          <a href="#about" className="hover:text-white">About</a>
-          <a href="#contact" className="hover:text-white">Contact</a>
+        <div className="flex items-center gap-3 sm:gap-8">
+          <div className="flex gap-3 text-[11px] font-medium text-white/80 sm:gap-8 sm:text-sm">
+            <a href="#gallery" className="hover:text-white"><T k="nav.gallery" /></a>
+            <a href="#about" className="hover:text-white"><T k="nav.about" /></a>
+            <a href="#contact" className="hover:text-white"><T k="nav.contact" /></a>
+          </div>
+          <LanguageSwitcher />
         </div>
       </nav>
-      <a href="#gallery" aria-label="Scroll down" className="absolute bottom-6 left-1/2 hidden sm:block z-10 -translate-x-1/2 animate-bounce text-white/70">↓</a>
+      <a href="#gallery" aria-label="Scroll down" className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 sm:block animate-bounce text-white/70">↓</a>
     </section>
   );
 }

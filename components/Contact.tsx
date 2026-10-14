@@ -1,137 +1,206 @@
+"use client";
+
 import Image from "next/image";
+import type { ReactNode } from "react";
+import { FaWhatsapp } from "react-icons/fa";
+import { LuArrowUpRight, LuClock, LuMail, LuMapPin } from "react-icons/lu";
+import { useT } from "./LanguageProvider";
+import Reveal from "./Reveal";
+import WeChatCard from "./WeChatCard";
 
 const WHATSAPP = "https://wa.me/8618079960724";
-const ADDRESS = "No. 88-8 East Xihu Road, Houqiao Subdistrict, Xishan District, Wuxi City, Jiangsu Province, China";
-const MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(ADDRESS)}&z=15&output=embed`;
-const MAP_LINK = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS)}`;
+const EMAIL = "qdtmotors@gmail.com";
 
-const icon = "h-5 w-5 stroke-current";
-const Svg = ({ children }: { children: React.ReactNode }) => (
-  <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={icon}>
-    {children}
-  </svg>
-);
+const mapLink = (address: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
-const rows: { label: string; icon: React.ReactNode; lines: { text: string; href?: string }[] }[] = [
+// Addresses are kept in English so couriers, maps and customers worldwide can all use them.
+const locations = [
   {
-    label: "Address",
-    icon: (
-      <Svg>
-        <path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z" />
-        <circle cx="12" cy="9.5" r="2.5" />
-      </Svg>
-    ),
-    lines: [{ text: ADDRESS, href: MAP_LINK }],
+    name: "Qin Datou (Wuxi) Vehicle Industry Co., Ltd",
+    address: "No. 88-8 East Xihu Road, Houqiao Subdistrict, Xishan District, Wuxi City, Jiangsu Province, China",
   },
   {
-    label: "Phone / WhatsApp",
-    icon: (
-      <Svg>
-        <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
-      </Svg>
-    ),
-    lines: [{ text: "+86 18079960724", href: WHATSAPP }],
-  },
-  {
-    label: "WeChat",
-    icon: (
-      <Svg>
-        <path d="M4 5h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
-      </Svg>
-    ),
-    lines: [{ text: "jieshidianmo" }, { text: "baozouxiaoyuangong" }],
-  },
-  {
-    label: "Email",
-    icon: (
-      <Svg>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="m3 7 9 6 9-6" />
-      </Svg>
-    ),
-    lines: [{ text: "qdtmotors@gmail.com", href: "mailto:qdtmotors@gmail.com" }],
+    name: "Qin Datou Vehicle Industry",
+    address: "No. 105 Qinghong Road, Ehu Town, Xishan District, Wuxi City, Jiangsu Province, China",
   },
 ];
 
-export default function Contact() {
+const navLinks = [
+  ["nav.gallery", "#gallery"],
+  ["nav.about", "#about"],
+  ["nav.contact", "#contact"],
+] as const;
+
+const cardBase = "group flex items-start gap-5 border border-white/10 bg-neutral-950/60 p-6 transition duration-300";
+const cardLink = `${cardBase} items-center hover:-translate-y-0.5 hover:border-red-500/50 hover:bg-neutral-950`;
+
+function IconBadge({ children }: { children: ReactNode }) {
   return (
-    <section id="contact" className="w-full border-t border-white/10 bg-neutral-900/60 px-6 pt-20 md:px-12 md:pt-32">
-      <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-5">
+    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-2xl text-red-500 transition-colors duration-300 group-hover:border-red-500 group-hover:bg-red-600 group-hover:text-white">
+      {children}
+    </div>
+  );
+}
+
+const Label = ({ children }: { children: ReactNode }) => (
+  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/40">{children}</p>
+);
+
+export default function Contact() {
+  const t = useT();
+
+  return (
+    <section id="contact" className="relative w-full overflow-hidden border-t border-white/10 bg-neutral-900/70 px-6 pt-24 md:px-12 md:pt-36">
+      <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-red-600/10 blur-[140px]" />
+
+      <div className="relative">
+        <Reveal>
           <p className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.35em] text-red-500">
-            <span className="h-px w-10 bg-red-500" /> Contact
+            <span className="h-px w-10 bg-red-500" /> {t("contact.eyebrow")}
           </p>
-          <h2 className="mt-6 text-3xl font-bold leading-[1.15] tracking-tight sm:text-4xl md:text-5xl">
-            Speak with our team.
-          </h2>
-          <p className="mt-6 max-w-md text-base leading-relaxed text-white/60 md:text-lg">
-            Tell us what you are looking for. We reply on WhatsApp, WeChat and email, and you are welcome to visit us in Wuxi.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <a
-              href={WHATSAPP}
-              target="_blank"
-              rel="noreferrer"
-              className="bg-red-600 px-7 py-3.5 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-red-500"
-            >
-              Chat on WhatsApp
-            </a>
-            <a
-              href="mailto:qdtmotors@gmail.com"
-              className="border border-white/25 px-7 py-3.5 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:border-white hover:bg-white/5"
-            >
-              Send an email
-            </a>
-          </div>
-        </div>
+        </Reveal>
 
-        <div className="lg:col-span-7">
-          <dl className="divide-y divide-white/10 border-y border-white/10">
-            {rows.map((r) => (
-              <div key={r.label} className="grid gap-2 py-6 sm:grid-cols-[200px_1fr] sm:gap-6">
-                <dt className="flex items-center gap-3 text-sm text-white/45">
-                  <span className="text-red-500">{r.icon}</span>
-                  {r.label}
-                </dt>
-                <dd className="space-y-1">
-                  {r.lines.map((l) =>
-                    l.href ? (
-                      <a
-                        key={l.text}
-                        href={l.href}
-                        target={l.href.startsWith("http") ? "_blank" : undefined}
-                        rel="noreferrer"
-                        className="block break-words text-base font-medium text-white/90 transition-colors hover:text-red-400"
-                      >
-                        {l.text}
-                      </a>
-                    ) : (
-                      <p key={l.text} className="break-words text-base font-medium text-white/90">
-                        {l.text}
-                      </p>
-                    ),
-                  )}
-                </dd>
+        {/* Call to action banner */}
+        <Reveal delay={100}>
+          <div className="relative mt-8 overflow-hidden bg-gradient-to-br from-red-600 via-red-700 to-red-950 px-8 py-14 md:px-16 md:py-20">
+            <Image
+              src="/logo-white.png"
+              alt=""
+              width={954}
+              height={834}
+              aria-hidden
+              className="pointer-events-none absolute -end-16 top-1/2 h-[130%] w-auto -translate-y-1/2 opacity-[0.07]"
+            />
+            <div className="relative max-w-3xl">
+              <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-6xl">{t("contact.title")}</h2>
+              <p className="mt-5 max-w-xl text-base text-white/80 md:text-lg">{t("contact.text")}</p>
+              <div className="mt-10 flex flex-wrap gap-3">
+                <a
+                  href={WHATSAPP}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2.5 bg-white px-7 py-3.5 text-sm font-semibold uppercase tracking-wider text-neutral-950 transition hover:bg-neutral-200"
+                >
+                  <FaWhatsapp className="text-lg" /> {t("contact.whatsappBtn")}
+                </a>
+                <a
+                  href={`mailto:${EMAIL}`}
+                  className="inline-flex items-center gap-2.5 border border-white/50 px-7 py-3.5 text-sm font-semibold uppercase tracking-wider text-white transition hover:bg-white/10"
+                >
+                  <LuMail className="text-lg" /> {t("contact.emailBtn")}
+                </a>
               </div>
-            ))}
-          </dl>
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Contact details + WeChat */}
+        <div className="mt-6 grid gap-6 lg:grid-cols-12">
+          <div className="grid content-start gap-6 lg:col-span-7">
+            <Reveal>
+              <a href={WHATSAPP} target="_blank" rel="noreferrer" className={cardLink}>
+                <IconBadge>
+                  <FaWhatsapp />
+                </IconBadge>
+                <div className="min-w-0 flex-1">
+                  <Label>{t("contact.whatsapp")}</Label>
+                  <p dir="ltr" className="mt-1.5 text-start text-base font-medium text-white md:text-lg">
+                    +86 18079960724
+                  </p>
+                </div>
+                <span className="hidden shrink-0 items-center gap-1.5 text-sm font-medium text-red-400 transition-all duration-300 group-hover:gap-3 sm:inline-flex">
+                  {t("contact.chat")} <LuArrowUpRight />
+                </span>
+              </a>
+            </Reveal>
+
+            <Reveal delay={100}>
+              <a href={`mailto:${EMAIL}`} className={cardLink}>
+                <IconBadge>
+                  <LuMail />
+                </IconBadge>
+                <div className="min-w-0 flex-1">
+                  <Label>{t("contact.email")}</Label>
+                  <p dir="ltr" className="mt-1.5 break-words text-start text-base font-medium text-white md:text-lg">
+                    {EMAIL}
+                  </p>
+                </div>
+                <span className="hidden shrink-0 items-center gap-1.5 text-sm font-medium text-red-400 transition-all duration-300 group-hover:gap-3 sm:inline-flex">
+                  {t("contact.send")} <LuArrowUpRight />
+                </span>
+              </a>
+            </Reveal>
+
+            <Reveal delay={200}>
+              <div className={cardBase}>
+                <IconBadge>
+                  <LuMapPin />
+                </IconBadge>
+                <div className="min-w-0 flex-1">
+                  <Label>{t("contact.visit")}</Label>
+                  <div className="mt-3 divide-y divide-white/10">
+                    {locations.map((l) => (
+                      <a
+                        key={l.address}
+                        href={mapLink(l.address)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="group/loc block py-4 first:pt-0 last:pb-0"
+                      >
+                        <p dir="ltr" className="text-start text-sm font-semibold text-white">
+                          {l.name}
+                        </p>
+                        <p dir="ltr" className="mt-1 text-start text-sm leading-relaxed text-white/60">
+                          {l.address}
+                        </p>
+                        <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-red-400 transition-all duration-300 group-hover/loc:gap-3">
+                          {t("contact.maps")} <LuArrowUpRight />
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal delay={300}>
+              <div className={cardBase}>
+                <IconBadge>
+                  <LuClock />
+                </IconBadge>
+                <div className="min-w-0 flex-1">
+                  <Label>{t("contact.hours")}</Label>
+                  <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                    <p className="text-base font-medium text-white md:text-lg">{t("contact.days")}</p>
+                    <p dir="ltr" className="text-base font-semibold text-white md:text-lg">
+                      08:00 – 17:00
+                    </p>
+                  </div>
+                  <p className="mt-1 text-xs text-white/40">{t("contact.tz")}</p>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+
+          <Reveal delay={150} className="lg:col-span-5">
+            <WeChatCard />
+          </Reveal>
         </div>
-      </div>
 
-      <div className="mt-16 overflow-hidden border border-white/10">
-        <iframe
-          title="QDT Motor location"
-          src={MAP_EMBED}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="h-72 w-full opacity-80 grayscale invert-[0.92] contrast-[0.9] md:h-96"
-        />
+        <footer className="mt-24 flex flex-col items-center justify-between gap-8 border-t border-white/10 py-10 md:flex-row">
+          <Image src="/logo-white.png" alt="QDT Motor" width={954} height={834} className="h-16 w-auto opacity-90" />
+          <nav className="flex gap-8 text-sm text-white/50">
+            {navLinks.map(([k, h]) => (
+              <a key={k} href={h} className="transition-colors hover:text-white">
+                {t(k)}
+              </a>
+            ))}
+          </nav>
+          <p className="text-center text-xs text-white/40 md:text-end">
+            © Qin Datou (Wuxi) Vehicle Industry Co., Ltd. {t("contact.rights")}
+          </p>
+        </footer>
       </div>
-
-      <footer className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-white/10 py-10 md:flex-row">
-        <Image src="/logo-white.png" alt="QDT Motor" width={954} height={834} className="h-16 w-auto opacity-80" />
-        <p className="text-center text-xs text-white/40 md:text-right">© Qin Datou (Wuxi) Vehicle Industry Co., Ltd. All rights reserved.</p>
-      </footer>
     </section>
   );
 }

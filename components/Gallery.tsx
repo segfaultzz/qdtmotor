@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useT } from "./LanguageProvider";
 
 type Img = { url: string; name: string; uploadedAt: string };
 
@@ -26,6 +27,7 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
   const [drag, setDrag] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
   const input = useRef<HTMLInputElement>(null);
+  const t = useT();
 
   const load = useCallback(async () => {
     const r = await fetch("/api/images", { cache: "no-store" });
@@ -135,10 +137,10 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
           ))}
         </div>
       ) : images.length === 0 ? (
-        <p className="mt-10 text-center text-white/50">{admin ? "No photos yet — upload your first one above." : "Photos coming soon."}</p>
+        <p className="mt-10 text-center text-white/50">{admin ? "No photos yet — upload your first one above." : t("gallery.empty")}</p>
       ) : (
         <>
-          <p className="mt-8 text-sm text-white/40">{images.length} photo{images.length === 1 ? "" : "s"}</p>
+          <p className="mt-8 text-sm text-white/40">{images.length === 1 ? t("gallery.count1") : t("gallery.count", { n: images.length })}</p>
           <div className="mt-4 grid auto-rows-[180px] grid-flow-dense grid-cols-2 gap-3 md:auto-rows-[240px] md:grid-cols-4 md:gap-4">
             {images.map((img, i) => {
               const size = i % 7 === 0 ? "col-span-2 row-span-2" : i % 7 === 3 ? "md:col-span-2" : "";
@@ -147,7 +149,7 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
                   key={img.url}
                   onClick={() => setOpen(i)}
                   className={`group relative overflow-hidden rounded-2xl bg-neutral-900 ring-1 ring-white/10 ${size}`}
-                  aria-label={`Open photo ${i + 1}`}
+                  aria-label={`${t("gallery.open")} ${i + 1}`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -157,7 +159,7 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-black/70 via-transparent to-transparent p-4 opacity-0 transition duration-300 group-hover:opacity-100">
-                    <span className="text-sm font-semibold text-white">View</span>
+                    <span className="text-sm font-semibold text-white">{t("gallery.view")}</span>
                     <span className="rounded-full bg-red-600 px-2.5 py-1 text-xs text-white">⤢</span>
                   </div>
                 </button>
@@ -179,7 +181,7 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
                   Delete
                 </button>
               )}
-              <button className="text-3xl leading-none" onClick={() => setOpen(null)} aria-label="Close">
+              <button className="text-3xl leading-none" onClick={() => setOpen(null)} aria-label={t("gallery.close")}>
                 ×
               </button>
             </div>
@@ -192,7 +194,7 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
                   e.stopPropagation();
                   setOpen((open - 1 + images.length) % images.length);
                 }}
-                aria-label="Previous"
+                aria-label={t("gallery.prev")}
               >
                 ‹
               </button>
@@ -211,7 +213,7 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
                   e.stopPropagation();
                   setOpen((open + 1) % images.length);
                 }}
-                aria-label="Next"
+                aria-label={t("gallery.next")}
               >
                 ›
               </button>
