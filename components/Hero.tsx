@@ -9,8 +9,11 @@ export default function Hero() {
   useEffect(() => {
     fetch("/api/video")
       .then((r) => r.json())
-      .then((d) => setSrc(d.url))
-      .catch(() => {});
+      .then((d) => {
+        setSrc(d.url);
+        if (!d.url) window.dispatchEvent(new Event("hero-ready"));
+      })
+      .catch(() => window.dispatchEvent(new Event("hero-ready")));
   }, []);
 
   return (
@@ -24,6 +27,8 @@ export default function Hero() {
           loop
           playsInline
           preload="auto"
+          onCanPlay={() => window.dispatchEvent(new Event("hero-ready"))}
+          onError={() => window.dispatchEvent(new Event("hero-ready"))}
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent" />

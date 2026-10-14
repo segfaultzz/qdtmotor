@@ -8,6 +8,11 @@ const useBlob = !!process.env.BLOB_READ_WRITE_TOKEN;
 const LOCAL_DIR = path.join(process.cwd(), "public", "uploads");
 const PREFIX = "vehicles/";
 
+// The Blob store is private, so files are served through /api/blob (which reads them with the token).
+export const blobUrl = (pathname: string) => `/api/blob?p=${encodeURIComponent(pathname)}`;
+export const pathnameFromUrl = (url: string) => new URL(url, "http://x").searchParams.get("p") ?? url;
+export const isAllowedPath = (p: string) => p.startsWith(PREFIX) || p.startsWith("site/video/");
+
 export const storageMode = useBlob ? "vercel-blob" : "local-disk";
 
 export async function listImages(): Promise<VehicleImage[]> {
@@ -15,7 +20,7 @@ export async function listImages(): Promise<VehicleImage[]> {
   if (useBlob) {
     const { blobs } = await list({ prefix: PREFIX, limit: 500 });
     items = blobs.map((b) => ({
-      url: b.url,
+      url: blobUrl(b.pathname),
       name: b.pathname.slice(PREFIX.length),
       uploadedAt: b.uploadedAt.toISOString(),
     }));
@@ -39,11 +44,11 @@ export async function saveImage(file: File): Promise<VehicleImage> {
   const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
   if (useBlob) {
     const b = await put(PREFIX + safe, file, {
-      access: "public",
+      access: "private",
       addRandomSuffix: true,
       contentType: file.type,
     });
-    return { url: b.url, name: safe, uploadedAt: new Date().toISOString() };
+    return { url: blobUrl(b.pathname), name: safe, uploadedAt: new Date().toISOString() };
   }
   await mkdir(LOCAL_DIR, { recursive: true });
   const name = `${Date.now()}-${safe}`;
@@ -52,7 +57,11 @@ export async function saveImage(file: File): Promise<VehicleImage> {
 }
 
 export async function deleteImage(url: string) {
-  if (useBlob) return del(url);
+  if (useBlob) {
+    const p = pathnameFromUrl(url);
+    if (!isAllowedPath(p)) throw new Error("Invalid path");
+    return del(p);
+  }
   const name = path.basename(url);
   await unlink(path.join(LOCAL_DIR, name));
 }
@@ -65,7 +74,7 @@ export async function getVideoUrl(): Promise<string | null> {
   if (useBlob) {
     const { blobs } = await list({ prefix: VIDEO_PREFIX });
     const newest = blobs.sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())[0];
-    return newest?.url ?? null;
+    return newest ? blobUrl(newest.pathname) : null;
   }
   try {
     await stat(path.join(LOCAL_VIDEO_DIR, "intro.mp4"));
@@ -85,6 +94,7 @@ export async function saveVideoLocal(file: File) {
 export async function deleteOldVideos(keepUrl: string) {
   if (!useBlob) return;
   const { blobs } = await list({ prefix: VIDEO_PREFIX });
-  const old = blobs.filter((b) => b.url !== keepUrl).map((b) => b.url);
+  const keep = pathnameFromUrl(keepUrl);
+  const old = blobs.filter((b) => b.pathname !== keep).map((b) => b.pathname);
   if (old.length) await del(old);
 }

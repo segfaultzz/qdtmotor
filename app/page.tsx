@@ -1,6 +1,29 @@
 import Image from "next/image";
+import Loader from "@/components/Loader";
 import Hero from "@/components/Hero";
 import Gallery from "@/components/Gallery";
+
+const WHATSAPP = "https://wa.me/8618079960724";
+
+type Line = { text: string; href?: string };
+const contacts: { label: string; lines: Line[] }[] = [
+  {
+    label: "Address",
+    lines: [{ text: "No. 88-8 East Xihu Road, Houqiao Subdistrict, Xishan District, Wuxi City, Jiangsu Province, China" }],
+  },
+  {
+    label: "Mobile / WhatsApp",
+    lines: [{ text: "+86 18079960724", href: WHATSAPP }],
+  },
+  {
+    label: "WeChat",
+    lines: [{ text: "jieshidianmo" }, { text: "baozouxiaoyuangong" }],
+  },
+  {
+    label: "Email",
+    lines: [{ text: "qdtmotors@gmail.com", href: "mailto:qdtmotors@gmail.com" }],
+  },
+];
 
 const pillars = [
   { t: "Quality Vehicles", d: "Every vehicle is carefully inspected and presented honestly, so you know exactly what you are getting." },
@@ -17,6 +40,7 @@ const steps = [
 export default function Home() {
   return (
     <main className="bg-neutral-950 text-white">
+      <Loader />
       <Hero />
 
       <section id="gallery" className="w-full px-6 py-16 md:px-12 md:py-32">
@@ -31,7 +55,7 @@ export default function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.4em] text-red-500">About QDT Motor</p>
             <h2 className="mt-3 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">Your trusted partner on the road.</h2>
             <p className="mt-8 max-w-3xl text-xl leading-relaxed text-white/70">
-              QDT Motor is dedicated to helping customers find, buy and enjoy the right vehicle. We
+              QDT Motor, operated by Qin Datou (Wuxi) Vehicle Industry Co., Ltd in Wuxi, China, is dedicated to helping customers find, buy and enjoy the right vehicle. We
               combine hands-on automotive knowledge with a simple promise: be honest, be reliable and
               treat every customer like family.
             </p>
@@ -67,14 +91,43 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="contact" className="border-t border-white/10 px-6 py-24 text-center">
-        <h2 className="text-4xl font-black md:text-5xl">Ready to take a closer look?</h2>
-        <p className="mt-4 text-white/60">Get in touch with our team today.</p>
-        <a href="mailto:info@qdtmotors.com" className="mt-8 inline-block rounded-full bg-red-600 px-8 py-3 font-semibold hover:bg-red-500">
-          info@qdtmotors.com
+      <section id="contact" className="w-full border-t border-white/10 px-6 py-16 md:px-12 md:py-28">
+        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-red-500">Contact</p>
+        <h2 className="mt-3 text-3xl font-black sm:text-4xl md:text-6xl">Let&apos;s talk.</h2>
+        <p className="mt-4 max-w-2xl text-lg text-white/60">
+          Message us on WhatsApp or WeChat, send an email, or visit us in Wuxi, China.
+        </p>
+
+        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {contacts.map((c) => (
+            <div key={c.label} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+              <p className="text-xs font-semibold uppercase tracking-widest text-red-500">{c.label}</p>
+              {c.lines.map((l) =>
+                l.href ? (
+                  <a key={l.text} href={l.href} target={l.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="mt-3 block break-words text-lg font-semibold hover:text-red-400">
+                    {l.text}
+                  </a>
+                ) : (
+                  <p key={l.text} className="mt-3 break-words text-lg font-semibold">{l.text}</p>
+                ),
+              )}
+            </div>
+          ))}
+        </div>
+
+        <a
+          href={WHATSAPP}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-10 inline-block rounded-full bg-green-600 px-8 py-3 font-semibold text-white transition hover:scale-105 hover:bg-green-500"
+        >
+          Chat on WhatsApp
         </a>
-        <Image src="/logo-white.png" alt="QDT Motor" width={954} height={834} className="mx-auto mt-16 h-24 w-auto opacity-80" />
-        <p className="mt-4 text-sm text-white/30">© QDT Motor</p>
+
+        <div className="mt-20 flex flex-col items-center gap-3 border-t border-white/10 pt-10 text-center">
+          <Image src="/logo-white.png" alt="QDT Motor" width={954} height={834} className="h-20 w-auto opacity-80" />
+          <p className="text-sm text-white/40">© Qin Datou (Wuxi) Vehicle Industry Co., Ltd</p>
+        </div>
       </section>
     </main>
   );

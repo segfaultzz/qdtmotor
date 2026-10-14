@@ -38,13 +38,13 @@ export default function VideoUploader() {
       let newUrl: string;
       if (mode === "vercel-blob") {
         const blob = await upload(`site/video/${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`, file, {
-          access: "public",
+          access: "private",
           handleUploadUrl: "/api/video/upload",
           clientPayload: pw,
           multipart: true,
           onUploadProgress: (p) => setPct(Math.round(p.percentage)),
         });
-        newUrl = blob.url;
+        newUrl = `/api/blob?p=${encodeURIComponent(blob.pathname)}`;
         await fetch("/api/video", {
           method: "POST",
           headers: { "content-type": "application/json", "x-admin-password": pw },
