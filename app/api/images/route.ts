@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { deleteImage, listImages, saveImage } from "@/lib/storage";
+import { deleteImage, listImages, saveImage, storageMode } from "@/lib/storage";
 
 const MAX_BYTES = 4 * 1024 * 1024; // Vercel serverless body limit is ~4.5MB
 
@@ -25,7 +25,15 @@ export async function POST(req: NextRequest) {
   for (const f of files) {
     if (!f.type.startsWith("image/")) return Response.json({ error: `${f.name} is not an image` }, { status: 400 });
     if (f.size > MAX_BYTES) return Response.json({ error: `${f.name} is too large (max 4MB)` }, { status: 413 });
-    saved.push(await saveImage(f));
+    try {
+      saved.push(await saveImage(f));
+    } catch (e) {
+      const hint =
+        storageMode === "local-disk" && process.env.VERCEL
+          ? "BLOB_READ_WRITE_TOKEN is missing: connect the Blob store to this project (Storage tab) and redeploy. "
+          : "";
+      return Response.json({ error: hint + (e instanceof Error ? e.message : String(e)) }, { status: 500 });
+    }
   }
   return Response.json({ images: saved });
 }

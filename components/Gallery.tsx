@@ -63,8 +63,8 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
       const form = new FormData();
       for (const f of files) form.append("files", await shrink(f));
       const r = await authed((headers) => fetch("/api/images", { method: "POST", body: form, headers }));
-      const data = await r.json();
-      if (!r.ok) setMsg(data.error ?? "Upload failed");
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) setMsg(data.error ?? `Upload failed (HTTP ${r.status})`);
       else {
         setMsg(`Uploaded ${data.images.length} image(s)`);
         await load();

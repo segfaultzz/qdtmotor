@@ -56,3 +56,35 @@ export async function deleteImage(url: string) {
   const name = path.basename(url);
   await unlink(path.join(LOCAL_DIR, name));
 }
+
+// ---- Landing page video ----
+const VIDEO_PREFIX = "site/video/";
+const LOCAL_VIDEO_DIR = path.join(LOCAL_DIR, "video");
+
+export async function getVideoUrl(): Promise<string | null> {
+  if (useBlob) {
+    const { blobs } = await list({ prefix: VIDEO_PREFIX });
+    const newest = blobs.sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())[0];
+    return newest?.url ?? null;
+  }
+  try {
+    await stat(path.join(LOCAL_VIDEO_DIR, "intro.mp4"));
+    return "/uploads/video/intro.mp4";
+  } catch {
+    return null;
+  }
+}
+
+// Local dev only: on Vercel the browser uploads straight to Blob.
+export async function saveVideoLocal(file: File) {
+  await mkdir(LOCAL_VIDEO_DIR, { recursive: true });
+  await writeFile(path.join(LOCAL_VIDEO_DIR, "intro.mp4"), Buffer.from(await file.arrayBuffer()));
+}
+
+// Remove every stored video except the one just uploaded.
+export async function deleteOldVideos(keepUrl: string) {
+  if (!useBlob) return;
+  const { blobs } = await list({ prefix: VIDEO_PREFIX });
+  const old = blobs.filter((b) => b.url !== keepUrl).map((b) => b.url);
+  if (old.length) await del(old);
+}

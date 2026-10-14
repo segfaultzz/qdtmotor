@@ -43,3 +43,6 @@ next-env.d.ts
 # local uploads (dev only)
 /public/uploads
 !.env.example
+
+# source video (uploaded via /upload, served from Blob)
+/video-source

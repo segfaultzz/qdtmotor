@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import VideoUploader from "@/components/VideoUploader";
 import Gallery from "@/components/Gallery";
 
 export const metadata: Metadata = {
@@ -14,6 +15,8 @@ export default function UploadPage() {
         <Link href="/" className="text-sm text-white/50 hover:text-white">← Back to website</Link>
         <h1 className="mb-2 mt-6 text-4xl font-black">Manage vehicle photos</h1>
         <p className="mb-10 text-white/60">Upload new photos or click a photo and choose Delete. Changes appear on the website gallery.</p>
+        <VideoUploader />
+        <h2 className="mb-4 text-xl font-bold">Vehicle photos</h2>
         <Gallery admin />
       </div>
     </main>

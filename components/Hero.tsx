@@ -1,17 +1,31 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function Hero() {
+  const [src, setSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/video")
+      .then((r) => r.json())
+      .then((d) => setSrc(d.url))
+      .catch(() => {});
+  }, []);
+
   return (
     <section className="relative aspect-video max-h-svh w-full overflow-hidden bg-black">
-      <video
-        className="absolute inset-0 h-full w-full object-cover"
-        src="/intro.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-      />
+      {src && (
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          src={src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent" />
       <nav className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 py-3 sm:px-6 sm:py-5 md:px-12">
         <a href="#" aria-label="QDT Motor home">
