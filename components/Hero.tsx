@@ -8,6 +8,7 @@ import { T } from "./LanguageProvider";
 
 const links = [
   ["nav.gallery", "#gallery"],
+  ["nav.services", "#services"],
   ["nav.about", "#about"],
   ["nav.contact", "#contact"],
 ] as const;
@@ -35,7 +36,7 @@ export default function Hero() {
         </a>
 
         <div className="flex items-center gap-3 sm:gap-8">
-          <div className="hidden gap-8 text-sm font-medium text-white/80 sm:flex">
+          <div className="hidden gap-6 text-sm font-medium text-white/80 sm:flex lg:gap-8">
             {links.map(([k, h]) => (
               <a key={k} href={h} className="transition-colors hover:text-white">
                 <T k={k} />

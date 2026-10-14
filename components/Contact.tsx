@@ -23,6 +23,7 @@ const locations = [
 
 const navLinks = [
   ["nav.gallery", "#gallery"],
+  ["nav.services", "#services"],
   ["nav.about", "#about"],
   ["nav.contact", "#contact"],
 ] as const;
@@ -46,7 +47,7 @@ export default function Contact() {
   const t = useT();
 
   return (
-    <section id="contact" className="relative w-full overflow-hidden border-t border-white/10 bg-neutral-900/70 px-6 pt-24 md:px-12 md:pt-36">
+    <section id="contact" className="relative w-full overflow-hidden border-t border-white/10 bg-neutral-900/70 px-6 pt-14 md:px-12 md:pt-36">
       <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-red-600/10 blur-[140px]" />
 
       <div className="relative">
@@ -183,7 +184,7 @@ export default function Contact() {
           </Reveal>
         </div>
 
-        <footer className="mt-24 flex flex-col items-center justify-between gap-8 border-t border-white/10 py-10 md:flex-row">
+        <footer className="mt-14 flex flex-col items-center justify-between md:mt-24 gap-8 border-t border-white/10 py-10 md:flex-row">
           <Image src="/logo-white.png" alt="QDT Motor" width={954} height={834} className="h-16 w-auto opacity-90" />
           <nav className="flex gap-8 text-sm text-white/50">
             {navLinks.map(([k, h]) => (

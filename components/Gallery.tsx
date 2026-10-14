@@ -150,7 +150,7 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
       )}
 
       {loading ? (
-        <div className="mt-10 space-y-4">
+        <div className="mt-6 space-y-4 md:mt-10">
           <div className="aspect-[4/3] animate-pulse bg-white/5 sm:aspect-[16/9]" />
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -159,9 +159,9 @@ export default function Gallery({ admin = false }: { admin?: boolean }) {
           </div>
         </div>
       ) : images.length === 0 ? (
-        <p className="mt-10 text-center text-white/50">{admin ? "No photos yet — upload your first one above." : t("gallery.empty")}</p>
+        <p className="mt-6 text-center text-white/50 md:mt-10">{admin ? "No photos yet — upload your first one above." : t("gallery.empty")}</p>
       ) : (
-        <div className="mt-10 space-y-10">
+        <div className="mt-6 space-y-8 md:mt-10 md:space-y-10">
           {!admin && (
             <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
               {/* Featured photo */}

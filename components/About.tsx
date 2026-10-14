@@ -22,7 +22,7 @@ export default function About() {
   ];
 
   return (
-    <section id="about" className="relative w-full overflow-hidden border-t border-white/10 bg-neutral-950 px-6 py-24 md:px-12 md:py-36">
+    <section id="about" className="relative w-full overflow-hidden border-t border-white/10 bg-neutral-950 px-6 py-14 md:px-12 md:py-36">
       {/* atmosphere: soft red glow */}
       <div className="pointer-events-none absolute -right-40 -top-40 h-[600px] w-[600px] rounded-full bg-red-600/15 blur-[140px]" />
 
@@ -38,7 +38,7 @@ export default function About() {
           </h2>
         </Reveal>
 
-        <div className="mt-16 grid gap-12 lg:grid-cols-12 lg:gap-20">
+        <div className="mt-10 grid gap-10 md:mt-16 lg:grid-cols-12 lg:gap-20">
           <Reveal className="lg:col-span-7">
             <p className="border-s-2 border-red-500 ps-6 text-xl font-medium leading-relaxed text-white/90 md:text-2xl">
               {t("about.lead")}
@@ -75,7 +75,7 @@ export default function About() {
           </Reveal>
         </div>
 
-        <div className="mt-24 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-14 grid gap-px md:mt-24 overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
           {capabilities.map((c, i) => (
             <Reveal key={c.t} delay={i * 100} className="bg-neutral-950">
               <div className="group relative h-full p-8 transition-colors duration-300 hover:bg-neutral-900">

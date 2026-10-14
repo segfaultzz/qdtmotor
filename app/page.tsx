@@ -1,6 +1,7 @@
 import Loader from "@/components/Loader";
 import Hero from "@/components/Hero";
 import Gallery from "@/components/Gallery";
+import Services from "@/components/Services";
 import About from "@/components/About";
 import Contact from "@/components/Contact";
 import { T } from "@/components/LanguageProvider";
@@ -11,13 +12,14 @@ export default function Home() {
       <Loader />
       <Hero />
 
-      <section id="gallery" className="w-full px-6 py-16 md:px-12 md:py-32">
+      <section id="gallery" className="w-full px-6 py-10 md:px-12 md:py-32">
         <p className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.35em] text-red-500">
           <span className="h-px w-10 bg-red-500" /> <T k="gallery.eyebrow" />
         </p>
         <Gallery />
       </section>
 
+      <Services />
       <About />
       <Contact />
     </main>
