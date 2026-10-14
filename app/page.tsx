@@ -15,7 +15,6 @@ export default function Home() {
         <p className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.35em] text-red-500">
           <span className="h-px w-10 bg-red-500" /> <T k="gallery.eyebrow" />
         </p>
-        <h2 className="mb-10 mt-6 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl"><T k="gallery.title" /></h2>
         <Gallery />
       </section>
 
